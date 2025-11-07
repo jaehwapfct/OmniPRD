@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniPRD - Your AI Product Brain</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- three.js for Hero Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #E0E0E0;
+            overflow-x: hidden;
+            /* Prevents horizontal scroll */
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4a4a4a;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Parallax section */
+        .parallax {
+            background-image: url('https://placehold.co/1920x1080/000000/333333?text=Abstract+Grid');
+            min-height: 500px;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: relative;
+        }
+
+        /* Scroll-in animation */
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(2rem);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            transition-delay: 0.1s;
+        }
+
+        .scroll-animate.in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hero canvas */
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.3; /* UPDATED: More subtle, like Jina.ai */
+        }
+
+        /* Language switcher active state */
+        .lang-btn.active {
+            color: #C084FC; /* Light purple */
+            font-weight: 700;
+        }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(90deg, #A78BFA, #4F46E5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Integrations logo reel */
+        .scrolling-wrapper {
+            overflow: hidden;
+            width: 100%;
+            mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+        }
+
+        .scrolling-logos {
+            display: flex;
+            width: max-content;
+            animation: scroll 40s linear infinite;
+        }
+
+        .scrolling-logos img {
+            height: 40px;
+            margin: 0 40px;
+            filter: grayscale(1) brightness(1.5);
+            opacity: 0.5; /* UPDATED: More subtle */
+            transition: filter 0.3s, opacity 0.3s;
+        }
+        
+        .scrolling-logos:hover {
+            animation-play-state: paused;
+        }
+        
+        .scrolling-logos img:hover {
+            filter: grayscale(0) brightness(1);
+            opacity: 1;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Bento Grid Item (Glassmorphism) */
+        .bento-grid-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        /* Spotlight Card Effect */
+        .spotlight-card {
+            position: relative;
+        }
+        .spotlight-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 1.5rem;
+            background: radial-gradient(
+                circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                rgba(255, 255, 255, 0.1), /* UPDATED: Subtle white/glass glow */
+                transparent 80%
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+            z-index: 1;
+        }
+        .spotlight-card:hover::before {
+            opacity: 1;
+        }
+        .spotlight-card > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Aurora Background Animation */
+        .aurora-container {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        .aurora-blob {
+            position: absolute;
+            filter: blur(100px);
+            opacity: 0.3;
+            animation: aurora-spin 20s linear infinite alternate;
+        }
+        .aurora-blob-1 {
+            background: #A78BFA; /* Purple */
+            width: 400px; height: 400px;
+            top: 10%; left: 10%;
+            animation-duration: 25s;
+        }
+        .aurora-blob-2 {
+            background: #4F46E5; /* Indigo */
+            width: 300px; height: 300px;
+            top: 60%; left: 70%;
+            animation-duration: 20s;
+        }
+
+        @keyframes aurora-spin {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(360deg) scale(1.2); }
+        }
+
+        /* NEW: Stylized Code Block */
+        .code-block-container {
+            background: #0A0A0A; /* Off-black */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        .code-block-header {
+            background: #111;
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+        .code-block-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .code-block-dot {
+            width: 0.75rem; height: 0.75rem;
+            border-radius: 50%;
+        }
+        .code-block pre {
+            padding: 1.5rem;
+            font-family: 'Menlo', 'Consolas', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            color: #b0b0b0;
+        }
+        .code-block .token-key { color: #A78BFA; } /* Purple */
+        .code-block .token-string { color: #a5f3fc; } /* Light Cyan */
+        .code-block .token-comment { color: #666; }
+
+    </style>
+</head>
+
+<body class="bg-black">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar">
+        <nav class="container mx-auto max-w-7xl px-6 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#" class="text-2xl font-bold gradient-text">
+                OmniPRD
+            </a>
+
+            <!-- Navigation Links -->
+            <div class="hidden md:flex space-x-8">
+                <a href="#home" class="text-gray-300 hover:text-white transition-colors data-lang-key" data-lang-key="navHome">Home</a>
+                <a href="#features" class="text-gray-300 hover:text-white transition-colors data-lang-key" data-lang-key="navFeatures">Features</a>
+                <a href="#integrations" class="text-gray-300 hover:text-white transition-colors data-lang-key" data-lang-key="navIntegrations">Integrations</a>
+                <a href="#security" class="text-gray-300 hover:text-white transition-colors data-lang-key" data-lang-key="navSecurity">Security</a>
+            </div>
+
+            <!-- Language & CTA -->
+            <div class="flex items-center space-x-4">
+                <!-- Language Switcher -->
+                <div class="text-gray-400 text-sm">
+                    <button id="lang-ko" class="lang-btn px-1 hover:text-white" data-lang="ko">KO</button>
+                    <span>/</span>
+                    <button id="lang-en" class="lang-btn px-1 hover:text-white active" data-lang="en">EN</button>
+                </div>
+                <a href="#"
+                    class="hidden sm:block bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium shadow-lg hover:from-purple-600 hover:to-indigo-700 transition-all transform hover:scale-105 data-lang-key" data-lang-key="navCTA">
+                    Get Started
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+
+        <!-- Hero Section -->
+        <section id="home" class="relative h-screen flex items-center justify-center text-center overflow-hidden">
+            <!-- Aurora Background -->
+            <div class="aurora-container">
+                <div class="aurora-blob aurora-blob-1"></div>
+                <div class="aurora-blob aurora-blob-2"></div>
+            </div>
+            
+            <!-- 3D Particle Canvas (Plexus) -->
+            <canvas id="hero-canvas"></canvas>
+
+            <!-- Hero Content -->
+            <div class="relative z-10 p-6" id="hero-content">
+                <h1 class="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-4"
+                    style="text-shadow: 0px 0px 30px rgba(0,0,0,0.7);">
+                    <span class="data-lang-key" data-lang-key="heroTitle">Your Product's</span>
+                    <span class="gradient-text data-lang-key" data-lang-key="heroTitleGradient">Living Brain</span>
+                </h1>
+                <p class="text-lg md:text-2xl text-gray-300 max-w-3xl mx-auto mb-8 data-lang-key" data-lang-key="heroSubtitle">
+                    OmniPRD connects to GitHub, Figma, Jira, and analytics to generate a PRD that's always in sync.
+                </p>
+                <a href="#"
+                    class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-bold shadow-2xl hover:from-purple-600 hover:to-indigo-700 transition-all transform hover:scale-105 data-lang-key" data-lang-key="heroCTA">
+                    Connect Your Workspace
+                </a>
+            </div>
+        </section>
+
+        <!-- Integrations Reel -->
+        <section class="py-16 bg-black">
+            <div class="container mx-auto max-w-7xl text-center px-6">
+                <p class="text-sm text-gray-400 mb-8 font-medium data-lang-key scroll-animate" data-lang-key="integrationsReelTitle">
+                    SEAMLESSLY CONNECTED TO YOUR ENTIRE STACK
+                </p>
+                <div class="scrolling-wrapper scroll-animate">
+                    <div class="scrolling-logos">
+                        <!-- Logos (Duplicated for seamless loop) -->
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=GitHub" alt="GitHub" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=GitHub'">
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=Figma" alt="Figma" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=Figma'">
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=Jira" alt="Jira" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=Jira'">
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=Notion" alt="Notion" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=Notion'">
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=Amplitude" alt="Amplitude" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=Amplitude'">
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=AppsFlyer" alt="AppsFlyer" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=AppsFlyer'">
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=Superset" alt="Superset" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=Superset'">
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=Vibe" alt="Vibe Coding" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=Vibe'">
+                        <!-- Duplicate set -->
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=GitHub" alt="GitHub" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=GitHub'">
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=Figma" alt="Figma" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=Figma'">
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=Jira" alt="Jira" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=Jira'">
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=Notion" alt="Notion" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=Notion'">
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=Amplitude" alt="Amplitude" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=Amplitude'">
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=AppsFlyer" alt="AppsFlyer" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=AppsFlyer'">
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=Superset" alt="Superset" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=Superset'">
+                        <img src="https://placehold.co/150x50/000000/FFFFFF?text=Vibe" alt="Vibe Coding" onerror="this.src='https://placehold.co/150x50/000000/FFFFFF?text=Vibe'">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bento Grid "How it Works" Section -->
+        <section class="py-32 bg-gray-950 overflow-hidden"> <!-- UPDATED: More padding -->
+            <div class="container mx-auto max-w-7xl px-6">
+                <div class="text-center mb-20 scroll-animate"> <!-- UPDATED: More margin -->
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-4 data-lang-key" data-lang-key="howTitle">
+                        The Truth is in Your Data.
+                    </h2>
+                    <p class="text-lg text-gray-400 max-w-2xl mx-auto data-lang-key" data-lang-key="howSubtitle">
+                        OmniPRD generates a living document from the source—your code, designs, and metrics.
+                    </p>
+                </div>
+
+                <!-- Bento Grid Layout -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Step 1 -->
+                    <div class="bento-grid-item spotlight-card p-8 md:col-span-1 scroll-animate">
+                        <!-- UPDATED: Large number style -->
+                        <span class="text-7xl font-extrabold gradient-text opacity-50">01</span>
+                        <h3 class="text-2xl font-bold text-white mt-4 mb-4 data-lang-key" data-lang-key="howStep1Title">Connect Sources</h3>
+                        <p class="text-gray-400 data-lang-key" data-lang-key="howStep1Desc">
+                            Link GitHub, Figma, Jira, Notion, and your analytics tools in seconds via our secure MCP.
+                        </p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="bento-grid-item spotlight-card p-8 md:col-span-2 scroll-animate" style="transition-delay: 0.2s;">
+                        <!-- UPDATED: Large number style -->
+                        <span class="text-7xl font-extrabold gradient-text opacity-50">02</span>
+                        <h3 class="text-2xl font-bold text-white mt-4 mb-4 data-lang-key" data-lang-key="howStep2Title">Multimodal Analysis</h3>
+                        <p class="text-gray-400 data-lang-key" data-lang-key="howStep2Desc">
+                            Our AI reads code, interprets design flows (vision), and reasons over tabular data from your dashboards.
+                        </p>
+                        <div class="mt-6 border border-gray-700 rounded-lg p-4 bg-black/20">
+                            <p class="text-xs text-gray-500">[AI Vision]...Figma frame 'user_login_v2' detected.</p>
+                            <p class="text-xs text-gray-500">[Code]...Correlating with `auth/login.py`...</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="bento-grid-item spotlight-card p-8 md:col-span-3 scroll-animate" style="transition-delay: 0.3s;">
+                        <!-- UPDATED: Large number style -->
+                        <span class="text-7xl font-extrabold gradient-text opacity-50">03</span>
+                        <h3 class="text-2xl font-bold text-white mt-4 mb-4 data-lang-key" data-lang-key="howStep3Title">Generate & Sync</h3>
+                        <p class="text-gray-400 data-lang-key" data-lang-key="howStep3Desc">
+                            Get a rich, comprehensive PRD. As you push new code or update designs, your PRD updates automatically.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-32 bg-black"> <!-- UPDATED: More padding -->
+            <div class="container mx-auto max-w-7xl px-6">
+                <div class="text-center mb-20 scroll-animate"> <!-- UPDATED: More margin -->
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-4 data-lang-key" data-lang-key="featuresTitle">
+                        One Brain. Total Clarity.
+                    </h2>
+                </div>
+
+                <!-- Bento Grid for Features -->
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+                    
+                    <!-- Feature 1: Multimodal -->
+                    <div class="bento-grid-item p-8 md:col-span-3 md:row-span-2 scroll-animate">
+                        <span class="text-purple-400 font-semibold data-lang-key" data-lang-key="feature1Tag">MULTIMODAL REASONING</span>
+                        <h2 class="text-3xl font-bold text-white my-4 data-lang-key" data-lang-key="feature1Title">Code + Vision + Data</h2>
+                        <p class="text-gray-400 text-lg mb-6 data-lang-key" data-lang-key="feature1Desc">
+                            OmniPRD doesn't just read text. It analyzes repository structure, interprets Figma prototypes, and correlates it with live data from Amplitude.
+                        </p>
+                        <ul class="space-y-3 text-gray-300 mb-6">
+                            <li class="flex items-center"><svg class="w-5 h-5 text-purple-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span class="data-lang-key" data-lang-key="feature1Bullet1">Infer architecture from code</span></li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-purple-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span class="data-lang-key" data-lang-key="feature1Bullet2">Translate Figma flows into user stories</span></li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-purple-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span class="data-lang-key" data-lang-key="feature1Bullet3">Link features to live KPIs</span></li>
+                        </ul>
+                        <img src="https://placehold.co/600x400/000000/FFFFFF?text=Multimodal+Analysis+Graph" alt="Multimodal Analysis" class="rounded-lg w-full mt-4 border border-gray-800" onerror="this.src='https://placehold.co/600x400/000000/FFFFFF?text=Multimodal+Analysis+Graph'">
+                    </div>
+
+                    <!-- Feature 2: Living Document -->
+                    <div class="bento-grid-item p-8 md:col-span-2 md:row-span-1 scroll-animate" style="transition-delay: 0.2s;">
+                        <span class="text-indigo-400 font-semibold data-lang-key" data-lang-key="feature2Tag">CONTINUOUS SYNC</span>
+                        <h2 class="text-3xl font-bold text-white my-4 data-lang-key" data-lang-key="feature2Title">A Truly Living Document</h2>
+                        <p class="text-gray-400 text-lg mb-6 data-lang-key" data-lang-key="feature2Desc">
+                            Webhooks from GitHub, Figma, and Jira detect changes, automatically triggering PRD updates with a full changelog.
+                        </p>
+                    </div>
+
+                    <!-- Feature 3: Deck Mode -->
+                    <div class="bento-grid-item p-8 md:col-span-2 md:row-span-1 scroll-animate" style="transition-delay: 0.3s;">
+                        <span class="text-green-400 font-semibold data-lang-key" data-lang-key="feature3Tag">PRESENTATION MODE</span>
+                        <h2 class="text-3xl font-bold text-white my-4 data-lang-key" data-lang-key="feature3Title">From Brain to Deck</h2>
+                        <p class="text-gray-400 text-lg mb-6 data-lang-key" data-lang-key="feature3Desc">
+                            Instantly generate investor summaries or design-first presentations from your unified product brain.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW: PRD-as-Code Section -->
+        <section class="py-32 bg-black overflow-hidden">
+            <div class="container mx-auto max-w-7xl px-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                    
+                    <!-- Left: Code Block -->
+                    <div class="code-block-container scroll-animate">
+                        <div class="code-block-header">
+                            <div class="code-block-dots">
+                                <div class="code-block-dot" style="background: #FF5F56;"></div>
+                                <div class="code-block-dot" style="background: #FFBD2E;"></div>
+                                <div class="code-block-dot" style="background: #27C93F;"></div>
+                            </div>
+                            <span class="text-gray-400 text-sm ml-4">prd/login-flow.ai.yml</span>
+                        </div>
+                        <pre class="code-block"><code>
+<span class="token-comment"># This PRD is auto-synced by OmniPRD</span>
+<span class="token-key">feature</span>: <span class="token-string">"User Authentication"</span>
+<span class="token-key">id</span>: <span class="token-string">"F-102"</span>
+<span class="token-key">status</span>: <span class="token-string">"In Development"</span>
+<span class="token-key">sources</span>:
+  <span class="token-key">code</span>: <span class="token-string">"github.com/…/auth/routes.py"</span>
+  <span class="token-key">design</span>: <span class="token-string">"figma.com/…/Login-Flow-v3"</span>
+  <span class="token-key">tasks</span>: <span class="token-string">"jira.com/browse/PROJ-123"</span>
+<span class="token-key">user_stories</span>:
+  - <span class="token-key">as</span>: <span class="token-string">"A new user"</span>
+    <span class="token-key">i_want_to</span>: <span class="token-string">"Sign up with my email"</span>
+    <span class="token-key">so_that</span>: <span class="token-string">"I can access my dashboard"</span>
+                        </code></pre>
+                    </div>
+
+                    <!-- Right: Text Content -->
+                    <div class="scroll-animate" style="transition-delay: 0.2s;">
+                        <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-6 data-lang-key" data-lang-key="codeTitle">
+                            Your Code *is* the PRD.
+                        </h2>
+                        <p class="text-lg text-gray-400 mb-8 data-lang-key" data-lang-key="codeSubtitle">
+                            OmniPRD generates a living document *from* your code, designs, and data. It's a version-controlled asset that reflects reality, not another doc to maintain.
+                        </p>
+                        <ul class="space-y-4 text-gray-300">
+                            <li class="flex items-center text-lg"><svg class="w-6 h-6 text-purple-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span class="data-lang-key" data-lang-key="codeFeature1">Generated directly from source</span></li>
+                            <li class="flex items-center text-lg"><svg class="w-6 h-6 text-purple-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span class="data-lang-key" data-lang-key="codeFeature2">Reflects Jira & Figma status</span></li>
+                            <li class="flex items-center text-lg"><svg class="w-6 h-6 text-purple-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span class="data-lang-key" data-lang-key="codeFeature3">Synced with Git activity</span></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Parallax Divider -->
+        <section class="parallax flex items-center justify-center">
+            <div class="absolute inset-0 bg-black/70"></div> <!-- Dark overlay -->
+            <div class="relative z-10 text-center p-8 scroll-animate">
+                <h2 class="text-4xl font-extrabold text-white shadow-lg data-lang-key" data-lang-key="parallaxTitle">
+                    Stop the alignment meetings.
+                </h2>
+                <p class="text-xl text-gray-200 mt-4 data-lang-key" data-lang-key="parallaxDesc">
+                    Sync the source, not the calendars.
+                </p>
+            </div>
+        </section>
+
+        <!-- Integrations Section -->
+        <section id="integrations" class="py-32 bg-gray-950"> <!-- UPDATED: More padding -->
+            <div class="container mx-auto max-w-7xl px-6">
+                <div class="text-center mb-20 scroll-animate"> <!-- UPDATED: More margin -->
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-4 data-lang-key" data-lang-key="integrationsTitle">
+                        Connect Your Entire Workspace
+                    </h2>
+                    <p class="text-lg text-gray-400 max-w-2xl mx-auto data-lang-key" data-lang-key="integrationsSubtitle">
+                        OmniPRD speaks every language your team does. Code, design, tasks, docs, and data, all in one place.
+                    </p>
+                </div>
+
+                <!-- Applied Spotlight and Bento styles -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 scroll-animate">
+                    <!-- Integration Cards -->
+                    <div class="bento-grid-item spotlight-card p-6 text-center transition-all transform hover:scale-105 hover:border-purple-500">
+                        <img src="https://placehold.co/80x80/ffffff/000000?text=GH" alt="GitHub" class="h-16 w-16 mx-auto mb-4 rounded-full bg-white" onerror="this.src='https://placehold.co/80x80/ffffff/000000?text=GH'">
+                        <h4 class="text-xl font-bold text-white">GitHub</h4>
+                        <p class="text-gray-400 text-sm data-lang-key" data-lang-key="integrationGithub">Code & Architecture</p>
+                    </div>
+                    <div class="bento-grid-item spotlight-card p-6 text-center transition-all transform hover:scale-105 hover:border-purple-500">
+                        <img src="https://placehold.co/80x80/ffffff/000000?text=Fig" alt="Figma" class="h-16 w-16 mx-auto mb-4 rounded-full bg-white" onerror="this.src='https://placehold.co/80x80/ffffff/000000?text=Fig'">
+                        <h4 class="text-xl font-bold text-white">Figma</h4>
+                        <p class="text-gray-400 text-sm data-lang-key" data-lang-key="integrationFigma">Design & UX Flows</p>
+                    </div>
+                    <div class="bento-grid-item spotlight-card p-6 text-center transition-all transform hover:scale-105 hover:border-purple-500">
+                        <img src="https://placehold.co/80x80/ffffff/000000?text=Jira" alt="Jira" class="h-16 w-16 mx-auto mb-4 rounded-full bg-white" onerror="this.src='https://placehold.co/80x80/ffffff/000000?text=Jira'">
+                        <h4 class="text-xl font-bold text-white">Jira</h4>
+                        <p class="text-gray-400 text-sm data-lang-key" data-lang-key="integrationJira">Epics & Sprints</p>
+                    </div>
+                    <div class="bento-grid-item spotlight-card p-6 text-center transition-all transform hover:scale-105 hover:border-purple-500">
+                        <img src="https://placehold.co/80x80/ffffff/000000?text=Notion" alt="Notion" class="h-16 w-16 mx-auto mb-4 rounded-full bg-white" onerror="this.src='https://placehold.co/80x80/ffffff/000000?text=Notion'">
+                        <h4 class="text-xl font-bold text-white">Notion</h4>
+                        <p class="text-gray-400 text-sm data-lang-key" data-lang-key="integrationNotion">OKRs & Docs</p>
+                    </div>
+                    <div class="bento-grid-item spotlight-card p-6 text-center transition-all transform hover:scale-105 hover:border-purple-500">
+                        <img src="https://placehold.co/80x80/ffffff/000000?text=Amp" alt="Amplitude" class="h-16 w-16 mx-auto mb-4 rounded-full bg-white" onerror="this.src='https://placehold.co/80x80/ffffff/000000?text=Amp'">
+                        <h4 class="text-xl font-bold text-white">Amplitude</h4>
+                        <p class="text-gray-400 text-sm data-lang-key" data-lang-key="integrationAmplitude">User Analytics</p>
+                    </div>
+                    <div class="bento-grid-item spotlight-card p-6 text-center transition-all transform hover:scale-105 hover:border-purple-500">
+                        <img src="https://placehold.co/80x80/ffffff/000000?text=Apps" alt="AppsFlyer" class="h-16 w-16 mx-auto mb-4 rounded-full bg-white" onerror="this.src='https://placehold.co/80x80/ffffff/000000?text=Apps'">
+                        <h4 class="text-xl font-bold text-white">AppsFlyer</h4>
+                        <p class="text-gray-400 text-sm data-lang-key" data-lang-key="integrationAppsFlyer">Marketing LTV</p>
+                    </div>
+                    <div class="bento-grid-item spotlight-card p-6 text-center transition-all transform hover:scale-105 hover:border-purple-500">
+                        <img src="https://placehold.co/80x80/ffffff/000000?text=Super" alt="Superset" class="h-16 w-16 mx-auto mb-4 rounded-full bg-white" onerror="this.src='https://placehold.co/80x80/ffffff/000000?text=Super'">
+                        <h4 class="text-xl font-bold text-white">Superset</h4>
+                        <p class="text-gray-400 text-sm data-lang-key" data-lang-key="integrationSuperset">Business BI</p>
+                    </div>
+                    <div class="bento-grid-item spotlight-card p-6 text-center transition-all transform hover:scale-105 hover:border-purple-500">
+                        <img src="https://placehold.co/80x80/ffffff/000000?text=Vibe" alt="Vibe" class="h-16 w-16 mx-auto mb-4 rounded-full bg-white" onerror="this.src='https://placehold.co/80x80/ffffff/000000?text=Vibe'">
+                        <h4 class="text-xl font-bold text-white">Vibe Coding</h4>
+                        <p class="text-gray-400 text-sm data-lang-key" data-lang-key="integrationVibe">Secure Platform</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security Section -->
+        <section id="security" class="py-32 bg-black"> <!-- UPDATED: More padding -->
+            <div class="container mx-auto max-w-4xl px-6 text-center scroll-animate">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-4 data-lang-key" data-lang-key="securityTitle">
+                    Enterprise-Grade Security
+                </h2>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-12 data-lang-key" data-lang-key="securitySubtitle">
+                    Your code, data, and designs are your most valuable assets. We treat them that way.
+                </p>
+                <!-- Applied Bento style -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                    <div class="bento-grid-item p-6">
+                        <h4 class="text-xl font-bold text-white mb-3 data-lang-key" data-lang-key="securityBlock1Title">Read-Only Access</h4>
+                        <p class="text-gray-400 text-sm data-lang-key" data-lang-key="securityBlock1Desc">
+                            OmniPRD only requests read-only permissions. We never write to your repos, design files, or databases.
+                        </p>
+                    </div>
+                    <div class="bento-grid-item p-6">
+                        <h4 class="text-xl font-bold text-white mb-3 data-lang-key" data-lang-key="securityBlock2Title">Data Redaction</h4>
+                        <p class="text-gray-400 text-sm data-lang-key" data-lang-key="securityBlock2Desc">
+                            Our AI is trained to automatically detect and redact sensitive data like API keys and credentials from all generated documents.
+                        </p>
+                    </div>
+                    <div class="bento-grid-item p-6">
+                        <h4 class="text-xl font-bold text-white mb-3 data-lang-key" data-lang-key="securityBlock3Title">Encrypted & Isolated</h4>
+                        <p class="text-gray-400 text-sm data-lang-key" data-lang-key="securityBlock3Desc">
+                            All tokens are encrypted (AES-256). Built on the Vibe Coding platform, your data is processed in isolated, secure containers.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA -->
+        <section class="py-32 bg-gray-950 relative overflow-hidden"> <!-- UPDATED: More padding -->
+             <!-- Aurora Background -->
+            <div class="aurora-container">
+                <div class="aurora-blob aurora-blob-1" style="left: 60%; top: 0%; animation-duration: 30s;"></div>
+                <div class="aurora-blob aurora-blob-2" style="left: 10%; top: 40%; animation-duration: 22s;"></div>
+            </div>
+
+            <div class="container mx-auto max-w-7xl px-6 text-center scroll-animate relative z-10">
+                <h2 class="text-4xl md:text-6xl font-extrabold text-white mb-6">
+                    <span class="data-lang-key" data-lang-key="ctaTitle">Stop guessing.</span><br>
+                    <span class="gradient-text data-lang-key" data-lang-key="ctaTitleGradient">Start knowing.</span>
+                </h2>
+                <p class="text-lg text-gray-400 max-w-xl mx-auto mb-10 data-lang-key" data-lang-key="ctaSubtitle">
+                    Create your first living PRD in under 5 minutes. Connect your workspace and see your product in a new light.
+                </p>
+                <a href="#"
+                    class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-10 py-5 rounded-lg text-xl font-bold shadow-2xl hover:from-purple-600 hover:to-indigo-700 transition-all transform hover:scale-105 data-lang-key" data-lang-key="ctaButton">
+                    Generate Your First PRD
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-12 bg-black border-t border-gray-900">
+        <div class="container mx-auto max-w-7xl px-6 text-center text-gray-500">
+            <p class="text-lg font-bold gradient-text mb-4">OmniPRD</p>
+            <div class="flex justify-center space-x-6 mb-6">
+                <a href="#" class="hover:text-gray-300 data-lang-key" data-lang-key="footerFeatures">Features</a>
+                <a href="#" class="hover:text-gray-300 data-lang-key" data-lang-key="footerIntegrations">Integrations</a>
+                <a href="#" class="hover:text-gray-300 data-lang-key" data-lang-key="footerSecurity">Security</a>
+                <a href="#" class="hover:text-gray-300 data-lang-key" data-lang-key="footerDocs">Docs</a>
+            </div>
+            <p class="text-sm">&copy; 2025 OmniPRD. Built on the Vibe Coding Platform. All rights reserved.</p>
+        </div>
+    </footer>
+
+
+    <script>
+        // --- Language Data ---
+        const lang = {
+            en: {
+                navHome: "Home",
+                navFeatures: "Features",
+                navIntegrations: "Integrations",
+                navSecurity: "Security",
+                navCTA: "Get Started",
+                heroTitle: "Your Product's",
+                heroTitleGradient: "Living Brain",
+                heroSubtitle: "OmniPRD connects to GitHub, Figma, Jira, and analytics to generate a PRD that's always in sync.",
+                heroCTA: "Connect Your Workspace",
+                integrationsReelTitle: "SEAMLESSLY CONNECTED TO YOUR ENTIRE STACK",
+                howTitle: "The Truth is in Your Data.",
+                howSubtitle: "OmniPRD generates a living document from the source—your code, designs, and metrics.",
+                howStep1Title: "Connect Sources",
+                howStep1Desc: "Link GitHub, Figma, Jira, Notion, and your analytics tools in seconds via our secure MCP.",
+                howStep2Title: "Multimodal Analysis",
+                howStep2Desc: "Our AI reads code, interprets design flows (vision), and reasons over tabular data from your dashboards.",
+                howStep3Title: "Generate & Sync",
+                howStep3Desc: "Get a rich, comprehensive PRD. As you push new code or update designs, your PRD updates automatically.",
+                featuresTitle: "One Brain. Total Clarity.",
+                feature1Tag: "MULTIMODAL REASONING",
+                feature1Title: "Code + Vision + Data",
+                feature1Desc: "OmniPRD doesn't just read text. It analyzes repository structure, interprets Figma prototypes, and correlates it with live data from Amplitude.",
+                feature1Bullet1: "Infer architecture from code",
+                feature1Bullet2: "Translate Figma flows into user stories",
+                feature1Bullet3: "Link features to live KPIs",
+                feature2Tag: "CONTINUOUS SYNC",
+                feature2Title: "A Truly Living Document",
+                feature2Desc: "Your PRD isn't a static file. After generating it from your sources, OmniPRD uses webhooks from GitHub, Figma, and Jira to detect changes, automatically triggering real-time updates.",
+                feature2Link: "See the PRD-as-Code workflow →",
+                feature3Tag: "PRESENTATION MODE",
+                feature3Title: "From Brain to Deck",
+                feature3Desc: "Instantly generate investor summaries or design-first presentations from your unified product brain.",
+                codeTitle: "Your Code *is* the PRD.", // UPDATED
+                codeSubtitle: "OmniPRD generates a living document *from* your code, designs, and data. It's a version-controlled asset that reflects reality, not another doc to maintain.", // UPDATED
+                codeFeature1: "Generated directly from source", // UPDATED
+                codeFeature2: "Reflects Jira & Figma status", // UPDATED
+                codeFeature3: "Synced with Git activity", // UPDATED
+                parallaxTitle: "Stop the alignment meetings.",
+                parallaxDesc: "Sync the source, not the calendars.",
+                integrationsTitle: "Connect Your Entire Workspace",
+                integrationsSubtitle: "OmniPRD speaks every language your team does. Code, design, tasks, docs, and data, all in one place.",
+                integrationGithub: "Code & Architecture",
+                integrationFigma: "Design & UX Flows",
+                integrationJira: "Epics & Sprints",
+                integrationNotion: "OKRs & Docs",
+                integrationAmplitude: "User Analytics",
+                integrationAppsFlyer: "Marketing LTV",
+                integrationSuperset: "Business BI",
+                integrationVibe: "Secure Platform",
+                securityTitle: "Enterprise-Grade Security",
+                securitySubtitle: "Your code, data, and designs are your most valuable assets. We treat them that way.",
+                securityBlock1Title: "Read-Only Access",
+                securityBlock1Desc: "OmniPRD only requests read-only permissions. We never write to your repos, design files, or databases.",
+                securityBlock2Title: "Data Redaction",
+                securityBlock2Desc: "Our AI is trained to automatically detect and redact sensitive data like API keys and credentials from all generated documents.",
+                securityBlock3Title: "Encrypted & Isolated",
+                securityBlock3Desc: "All tokens are encrypted (AES-256). Built on the Vibe Coding platform, your data is processed in isolated, secure containers.",
+                ctaTitle: "Stop guessing.",
+                ctaTitleGradient: "Start knowing.",
+                ctaSubtitle: "Create your first living PRD in under 5 minutes. Connect your workspace and see your product in a new light.",
+                ctaButton: "Generate Your First PRD",
+                footerFeatures: "Features",
+                footerIntegrations: "Integrations",
+                footerSecurity: "Security",
+                footerDocs: "Docs",
+            },
+            ko: {
+                navHome: "홈",
+                navFeatures: "기능",
+                navIntegrations: "연동",
+                navSecurity: "보안",
+                navCTA: "시작하기",
+                heroTitle: "프로덕트의",
+                heroTitleGradient: "살아있는 두뇌",
+                heroSubtitle: "OmniPRD가 GitHub, Figma, Jira, 그리고 분석 데이터에 연결되어 항상 최신 상태인 PRD를 생성합니다.",
+                heroCTA: "워크스페이스 연결하기",
+                integrationsReelTitle: "당신의 모든 스택과 매끄럽게 연결됩니다",
+                howTitle: "진실은 데이터 속에 있습니다.",
+                howSubtitle: "OmniPRD는 코드, 디자인, 지표 등 원본 소스에서 직접 살아있는 문서를 생성합니다.",
+                howStep1Title: "소스 연결",
+                howStep1Desc: "GitHub, Figma, Jira, Notion 및 분석 도구를 보안 MCP를 통해 몇 초 만에 연결하세요.",
+                howStep2Title: "멀티모달 분석",
+                howStep2Desc: "AI가 코드를 읽고, 디자인 플로우(비전)를 해석하며, 대시보드의 정형 데이터를 분석합니다.",
+                howStep3Title: "생성 및 동기화",
+                howStep3Desc: "풍부하고 포괄적인 PRD를 만나보세요. 새 코드를 푸시하거나 디자인을 업데이트하면 PRD가 자동 업데이트됩니다.",
+                featuresTitle: "하나의 두뇌. 완전한 명확성.",
+                feature1Tag: "멀티모달 추론",
+                feature1Title: "코드 + 비전 + 데이터",
+                feature1Desc: "OmniPRD는 단순한 텍스트 리더가 아닙니다. 레파지토리 구조를 분석하여 아키텍처를 이해하고, 비전으로 Figma 프로토타입을 해석하며, Amplitude의 라이브 데이터와 모든 것을 연관시킵니다.",
+                feature1Bullet1: "코드에서 아키텍처 추론",
+                feature1Bullet2: "Figma 플로우를 유저 스토리로 번역",
+                feature1Bullet3: "주요 기능을 실시간 KPI와 연결",
+                feature2Tag: "지속적인 동기화",
+                feature2Title: "진정으로 살아있는 문서",
+                feature2Desc: "PRD는 한번 만들고 잊혀지는 문서가 아닙니다. OmniPRD는 소스에서 문서를 생성한 후, GitHub, Figma, Jira의 웹훅으로 변경 사항을 감지하여 PRD를 실시간으로 자동 업데이트합니다.",
+                feature2Link: "PRD-as-Code 워크플로우 보기 →",
+                feature3Tag: "발표 모드",
+                feature3Title: "두뇌에서 발표자료로",
+                feature3Desc: "통합된 프로덕트 두뇌에서 투자자 요약본이나 디자인 중심의 발표 자료를 즉시 생성하세요.",
+                codeTitle: "당신의 코드가 PRD입니다.", // UPDATED
+                codeSubtitle: "OmniPRD는 코드, 디자인, 데이터로부터 살아있는 문서를 *생성*합니다. 현실을 반영하는 버전 관리 자산이며, 따로 유지보수할 문서가 아닙니다.", // UPDATED
+                codeFeature1: "소스에서 직접 생성됨", // UPDATED
+                codeFeature2: "Jira & Figma 상태 반영", // UPDATED
+                codeFeature3: "Git 활동과 동기화됨", // UPDATED
+                parallaxTitle: "싱크를 위한 회의는 그만.",
+                parallaxDesc: "캘린더가 아닌, 소스를 동기화하세요.",
+                integrationsTitle: "워크스페이스 전체 연결",
+                integrationsSubtitle: "OmniPRD는 여러분의 팀이 사용하는 모든 언어를 구사합니다. 코드, 디자인, 태스크, 문서, 데이터를 모두 한 곳에서 관리하세요.",
+                integrationGithub: "코드 & 아키텍처",
+                integrationFigma: "디자인 & UX 플로우",
+                integrationJira: "에픽 & 스프린트",
+                integrationNotion: "OKR & 문서",
+                integrationAmplitude: "유저 분석",
+                integrationAppsFlyer: "마케팅 LTV",
+                integrationSuperset: "비즈니스 BI",
+                integrationVibe: "보안 플랫폼",
+                securityTitle: "엔터프라이즈급 보안",
+                securitySubtitle: "여러분의 코드, 데이터, 디자인은 가장 소중한 자산입니다. 저희도 그렇게 생각합니다.",
+                securityBlock1Title: "읽기 전용 액세스",
+                securityBlock1Desc: "OmniPRD는 읽기 전용 권한만 요청합니다. 여러분의 레포, 디자인 파일, 데이터베이스에 절대로 쓰기 작업을 수행하지 않습니다.",
+                securityBlock2Title: "민감 데이터 편집",
+                securityBlock2Desc: "저희 AI는 생성된 모든 문서에서 API 키 및 인증 정보와 같은 민감한 데이터를 자동으로 감지하고 삭제하도록 훈련되었습니다.",
+                securityBlock3Title: "암호화 및 격리",
+                securityBlock3Desc: "모든 토큰은 AES-256으로 암호화됩니다. Vibe Coding 플랫폼 위에서 여러분의 데이터는 격리된 보안 컨테이너에서 처리됩니다.",
+                ctaTitle: "추측은 그만.",
+                ctaTitleGradient: "이제 확신하세요.",
+                ctaSubtitle: "5분 안에 첫 번째 살아있는 PRD를 만드세요. 워크스페이스를 연결하고 제품을 새로운 시각으로 바라보세요.",
+                ctaButton: "첫 PRD 생성하기",
+                footerFeatures: "기능",
+                footerIntegrations: "연동",
+                footerSecurity: "보안",
+                footerDocs: "문서",
+            }
+        };
+
+        // --- Language Switcher Logic ---
+        const langElements = document.querySelectorAll('.data-lang-key');
+        const langButtons = document.querySelectorAll('.lang-btn');
+
+        const setLanguage = (langCode) => {
+            langElements.forEach(el => {
+                const key = el.getAttribute('data-lang-key');
+                if (key && lang[langCode] && lang[langCode][key]) {
+                    el.innerHTML = lang[langCode][key];
+                }
+            });
+            langButtons.forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === langCode);
+            });
+            document.documentElement.lang = langCode;
+        };
+
+        langButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const langCode = e.target.getAttribute('data-lang');
+                setLanguage(langCode);
+            });
+        });
+        
+        // Set default language based on browser, fallback to 'en'
+        const userLang = navigator.language || navigator.userLanguage;
+        if (userLang.startsWith('ko')) {
+            setLanguage('ko');
+        } else {
+            setLanguage('en');
+        }
+
+        // --- Navbar Scroll Effect ---
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                // UPDATED: More polished blur
+                navbar.classList.add('bg-black/50', 'backdrop-blur-2xl', 'shadow-lg');
+            } else {
+                navbar.classList.remove('bg-black/50', 'backdrop-blur-2xl', 'shadow-lg');
+            }
+        }, { passive: true });
+
+        // --- Scroll-in on View ---
+        const scrollSections = document.querySelectorAll('.scroll-animate');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        scrollSections.forEach(section => {
+            observer.observe(section);
+        });
+
+        // --- Spotlight Card JS ---
+        document.body.addEventListener('mousemove', (e) => {
+            document.querySelectorAll('.spotlight-card').forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        }, { passive: true });
+
+        // --- three.js Hero Animation (Plexus) ---
+        let scene, camera, renderer, particles, line;
+        let mouseX = 0, mouseY = 0;
+        let windowHalfX = window.innerWidth / 2;
+        let windowHalfY = window.innerHeight / 2;
+        
+        const particleCount = 200;
+        const maxDistance = 100;
+        let positions;
+        let particleVelocities;
+
+        function initHeroAnimation() {
+            const canvas = document.getElementById('hero-canvas');
+            if (!canvas) return;
+
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 3000);
+            camera.position.z = 400;
+
+            // Particle Geometry
+            const particleGeometry = new THREE.BufferGeometry();
+            positions = new Float32Array(particleCount * 3);
+            particleVelocities = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+            const color = new THREE.Color();
+
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                positions[i3] = (Math.random() - 0.5) * 1000;
+                positions[i3 + 1] = (Math.random() - 0.5) * 1000;
+                positions[i3 + 2] = (Math.random() - 0.5) * 400; // Flatter
+                
+                particleVelocities[i3] = (Math.random() - 0.5) * 0.5;
+                particleVelocities[i3 + 1] = (Math.random() - 0.5) * 0.5;
+                particleVelocities[i3 + 2] = (Math.random() - 0.5) * 0.5;
+
+                // Color
+                if (Math.random() > 0.8) {
+                    color.set(0xA78BFA); // Purple
+                } else if (Math.random() > 0.8) {
+                    color.set(0x4F46E5); // Indigo
+                } else {
+                    color.set(0xffffff); // White
+                }
+                colors[i3] = color.r;
+                colors[i3 + 1] = color.g;
+                colors[i3 + 2] = color.b;
+            }
+            particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            
+            // Particle Material
+            const particleMaterial = new THREE.PointsMaterial({
+                size: 2,
+                vertexColors: true,
+                blending: THREE.AdditiveBlending,
+                transparent: true,
+            });
+            particles = new THREE.Points(particleGeometry, particleMaterial);
+            scene.add(particles);
+
+            // Line Geometry
+            const lineGeometry = new THREE.BufferGeometry();
+            // Allocate buffer size. We might not use all of it.
+            const linePositions = new Float32Array(particleCount * particleCount * 3); 
+            lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+            lineGeometry.setDrawRange(0, 0); // Initially draw nothing
+            
+            // Line Material
+            const lineMaterial = new THREE.LineBasicMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.05,
+            });
+            line = new THREE.LineSegments(lineGeometry, lineMaterial);
+            scene.add(line);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+
+            document.addEventListener('mousemove', onMouseMove, { passive: true });
+            window.addEventListener('resize', onWindowResize, false);
+        }
+
+        function onWindowResize() {
+            windowHalfX = window.innerWidth / 2;
+            windowHalfY = window.innerHeight / 2;
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function onMouseMove(event) {
+            mouseX = (event.clientX - windowHalfX) * 0.2;
+            mouseY = (event.clientY - windowHalfY) * 0.2;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            render();
+        }
+
+        function render() {
+            // Ensure renderer exists
+            if (!renderer) return;
+
+            const time = Date.now() * 0.0001;
+
+            camera.position.x += (mouseX - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            const particlePositions = particles.geometry.attributes.position.array;
+            const linePositions = line.geometry.attributes.position.array;
+            let lineVertexIndex = 0; // Index for line vertices (pairs of points)
+
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                // Move particles
+                particlePositions[i3] += particleVelocities[i3];
+                particlePositions[i3 + 1] += particleVelocities[i3 + 1];
+                particlePositions[i3 + 2] += particleVelocities[i3 + 2];
+
+                // Check boundaries and reverse velocity
+                if (particlePositions[i3] > 500 || particlePositions[i3] < -500) particleVelocities[i3] *= -1;
+                if (particlePositions[i3 + 1] > 500 || particlePositions[i3 + 1] < -500) particleVelocities[i3 + 1] *= -1;
+                if (particlePositions[i3 + 2] > 200 || particlePositions[i3 + 2] < -200) particleVelocities[i3 + 2] *= -1;
+
+                // Check for lines (only check particles after this one)
+                for (let j = i + 1; j < particleCount; j++) {
+                    const j3 = j * 3;
+                    const dx = particlePositions[i3] - particlePositions[j3];
+                    const dy = particlePositions[i3 + 1] - particlePositions[j3 + 1];
+                    const dz = particlePositions[i3 + 2] - particlePositions[j3 + 2];
+                    const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                    if (dist < maxDistance) {
+                        // Add line segment
+                        // Make sure we don't overflow the buffer
+                        if (lineVertexIndex < linePositions.length / 3) {
+                            const lineIndex = lineVertexIndex * 3;
+                            linePositions[lineIndex] = particlePositions[i3];
+                            linePositions[lineIndex + 1] = particlePositions[i3 + 1];
+                            linePositions[lineIndex + 2] = particlePositions[i3 + 2];
+                            
+                            linePositions[lineIndex + 3] = particlePositions[j3];
+                            linePositions[lineIndex + 4] = particlePositions[j3 + 1];
+                            linePositions[lineIndex + 5] = particlePositions[j3 + 2];
+                            
+                            lineVertexIndex += 2; // We added two vertices (one line)
+                        }
+                    }
+                }
+            }
+            
+            // Set how much of the line buffer to draw
+            line.geometry.setDrawRange(0, lineVertexIndex);
+            line.geometry.attributes.position.needsUpdate = true;
+            particles.geometry.attributes.position.needsUpdate = true;
+            
+            // Rotate the whole thing slowly
+            scene.rotation.y = time * 0.1;
+
+            renderer.render(scene, camera);
+        }
+
+        // Only initialize and animate if three.js loaded
+        if (typeof THREE === 'undefined') {
+            console.error('three.js failed to load.');
+        } else {
+            initHeroAnimation();
+            animate();
+        }
+
+
+        // --- Hero Text Parallax ---
+        const heroContent = document.getElementById('hero-content');
+        if (heroContent) {
+            document.addEventListener('mousemove', (event) => {
+                // Check if windowHalfX is defined
+                if (typeof windowHalfX === 'undefined') {
+                    windowHalfX = window.innerWidth / 2;
+                    windowHalfY = window.innerHeight / 2;
+                }
+                const { clientX, clientY } = event;
+                const x = (clientX - windowHalfX) / windowHalfX * 10; // Max 10px movement
+                const y = (clientY - windowHalfY) / windowHalfY * 10; // Max 10px movement
+
+                // Apply a subtle parallax effect
+                heroContent.style.transform = `translate(${x * -0.5}px, ${y * -0.5}px)`;
+            }, { passive: true });
+        }
+
+    </script>
+
+</body>
+
+</html>
